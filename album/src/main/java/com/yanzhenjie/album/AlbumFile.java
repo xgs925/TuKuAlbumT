@@ -109,6 +109,15 @@ public class AlbumFile implements Parcelable, Comparable<AlbumFile> {
      * Enabled.
      */
     private boolean isEnable = true;
+private float ratio=0;
+
+    public float getRatio() {
+        return ratio;
+    }
+
+    public void setRatio(float ratio) {
+        this.ratio = ratio;
+    }
 
     public AlbumFile() {
     }

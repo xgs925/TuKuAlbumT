@@ -33,7 +33,7 @@ public class ImageFragment extends Fragment {
     private Filter<String> mMimeFilter;
     private Filter<Long> mDurationFilter;
     private boolean mFilterVisibility;
-    List<Image> images = new ArrayList<>();
+    List<AlbumFile> images = new ArrayList<>();
     @BindView(R.id.rv_img)
     RecyclerView mRecyclerView;
     ImageListAdapter imageListAdapter;
@@ -54,11 +54,9 @@ public class ImageFragment extends Fragment {
             @Override
             public void onScanCallback(ArrayList<AlbumFolder> folders) {
                 ArrayList<AlbumFile> albumFiles = folders.get(0).getAlbumFiles();
-                for (AlbumFile albumFile : albumFiles
-                        ) {
-                    images.add(new Image("file://" + albumFile.getPath()));
-                }
-                imageListAdapter.notifyDataSetChanged();
+
+                images.addAll(albumFiles);
+                imageListAdapter.notifyItemRangeInserted(images.size(),albumFiles.size());
             }
         }, new ArrayList<AlbumFile>(), mSizeFilter, mMimeFilter, mDurationFilter, mFilterVisibility);
         scanTask.execute(new ArrayList<AlbumFile>());
@@ -76,7 +74,7 @@ public class ImageFragment extends Fragment {
 //            }
 //        });
         mRecyclerView.setLayoutManager(layoutManager);
-
+        mRecyclerView.setHasFixedSize(true);
         imageListAdapter = new ImageListAdapter(getContext(), images);
 
         mRecyclerView.setAdapter(imageListAdapter);

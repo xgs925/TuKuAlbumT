@@ -8,6 +8,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.animation.GlideAnimation;
@@ -16,6 +17,10 @@ import com.bumptech.glide.request.target.SizeReadyCallback;
 import com.tukualbum.app.entity.Image;
 import com.tukualbum.app.view.DynamicHeightImageView;
 import com.tukualbum.tukualbum.R;
+import com.yanzhenjie.album.Album;
+import com.yanzhenjie.album.AlbumFile;
+import com.yanzhenjie.album.task.DefaultAlbumLoader;
+import com.yanzhenjie.album.util.DisplayUtils;
 
 import java.util.HashMap;
 import java.util.List;
@@ -28,12 +33,12 @@ import butterknife.ButterKnife;
  */
 
 public class ImageListAdapter extends RecyclerView.Adapter<ImageListAdapter.ViewHolder> {
-    private List<Image> mList;
+    private List<AlbumFile> mList;
     private Context mContext;
     private HashMap imageRMap = new HashMap();
 
 
-    public ImageListAdapter(Context context, List<Image> imageList) {
+    public ImageListAdapter(Context context, List<AlbumFile> imageList) {
         mList = imageList;
         mContext = context;
     }
@@ -51,27 +56,35 @@ public class ImageListAdapter extends RecyclerView.Adapter<ImageListAdapter.View
 
     @Override
     public void onBindViewHolder(final ViewHolder viewHolder, final int position) {
-        Image image = mList.get(position);
+        final AlbumFile image = mList.get(position);
         viewHolder.image = image;
-        if (imageRMap.containsKey(position)) {
-            viewHolder.imageView.setRatio((Float) imageRMap.get(position));
-        }
-        Glide.with(mContext).load(image.url)
-                .asBitmap()
-                .placeholder(R.mipmap.ic_launcher)
 
-
-                .into(new SimpleTarget<Bitmap>() {
-                    @Override
-                    public void onResourceReady(Bitmap resource, GlideAnimation<? super Bitmap> glideAnimation) {
-                        if (!imageRMap.containsKey(position)) {
-                            float r = (resource.getHeight() * 1.0f) / resource.getWidth();
-                            imageRMap.put(position, r);
-                            viewHolder.imageView.setRatio(r);
-                        }
-                        viewHolder.imageView.setImageBitmap(resource);
+        DefaultAlbumLoader albumLoader= (DefaultAlbumLoader)Album.getAlbumConfig().getAlbumLoader();
+        if (image.getRatio()!=0) {
+            RelativeLayout.LayoutParams rlp = (RelativeLayout.LayoutParams) viewHolder.imageView.getLayoutParams();
+            rlp.width=200;
+            rlp.height = (int) (rlp.width * image.getRatio());
+            viewHolder.imageView.setLayoutParams(rlp);
+            viewHolder.imageView.setRatio(image.getRatio());
+        }else {
+            albumLoader.setCallback(new DefaultAlbumLoader.Callback() {
+                @Override
+                public void done(int h, int w) {
+                    if (!imageRMap.containsKey(position)) {
+                        float r = (h * 1.0f) / w;
+                        image.setRatio(r);
+                        imageRMap.put(position, r);
+                        RelativeLayout.LayoutParams rlp = (RelativeLayout.LayoutParams) viewHolder.imageView.getLayoutParams();
+                        rlp.width=200;
+                        rlp.height = (int) (rlp.width * r);
+                        viewHolder.imageView.setLayoutParams(rlp);
+                        viewHolder.imageView.setRatio(r);
                     }
-                });
+                }
+            });
+        }
+//        albumLoader.loadAlbumFile(viewHolder.imageView,image, 500,500);
+        Glide.with(mContext).load("file://"+image.getPath()).into(viewHolder.imageView);
     }
 
 
@@ -90,7 +103,7 @@ public class ImageListAdapter extends RecyclerView.Adapter<ImageListAdapter.View
 
         @BindView(R.id.iv_img)
         DynamicHeightImageView imageView;
-        Image image;
+        AlbumFile image;
 
 
         public ViewHolder(View itemView) {

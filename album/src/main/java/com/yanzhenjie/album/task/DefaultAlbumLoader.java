@@ -49,6 +49,15 @@ public class DefaultAlbumLoader implements AlbumLoader {
 
     private static Drawable sErrorDrawable = new ColorDrawable(Color.parseColor("#FF2B2B2B"));
     private static Drawable sPlaceHolderDrawable = new ColorDrawable(Color.parseColor("#FF2B2B2B"));
+    private  Callback callback;
+
+    public void setCallback(Callback callback) {
+        this.callback = callback;
+    }
+
+    public interface Callback{
+        void done(int h,int w);
+    }
 
     /**
      * Single module.
@@ -138,7 +147,9 @@ public class DefaultAlbumLoader implements AlbumLoader {
         Bitmap bitmap = getImageFromCache(imagePath, viewWidth, viewHeight);
         if (bitmap == null) {
             imageView.setImageDrawable(sPlaceHolderDrawable);
-            mExecutorService.execute(new LoadImageTask(this, imageView, imagePath, viewWidth, viewHeight));
+            LoadImageTask loadImageTask=new LoadImageTask(this, imageView, imagePath, viewWidth, viewHeight);
+            loadImageTask.setCallback(callback);
+            mExecutorService.execute(loadImageTask);
         } else {
             BitmapHolder holder = new BitmapHolder();
             holder.mImageView = imageView;
@@ -200,6 +211,7 @@ public class DefaultAlbumLoader implements AlbumLoader {
             holder.mImageView = mImageView;
             holder.mTargetPath = mFilePath;
             getHandler().post(holder);
+
         }
     }
 
@@ -210,6 +222,11 @@ public class DefaultAlbumLoader implements AlbumLoader {
         private String mImagePath;
         private int mViewWidth;
         private int mViewHeight;
+        private Callback callback;
+
+        public void setCallback(Callback callback) {
+            this.callback = callback;
+        }
 
         LoadImageTask(DefaultAlbumLoader loader, ImageView imageView, String imagePath, int viewWidth, int viewHeight) {
             this.mLoader = loader;
@@ -232,6 +249,7 @@ public class DefaultAlbumLoader implements AlbumLoader {
             holder.mImageView = mImageView;
             holder.mTargetPath = mImagePath;
             getHandler().post(holder);
+            holder.setCallback(callback);
         }
     }
 
@@ -368,7 +386,11 @@ public class DefaultAlbumLoader implements AlbumLoader {
         Bitmap mBitmap;
         ImageView mImageView;
         String mTargetPath;
+        private Callback callback;
 
+        public void setCallback(Callback callback) {
+            this.callback = callback;
+        }
         @Override
         public void run() {
             if (mTargetPath.equals(mImageView.getTag(R.id.album_image_load_tag))) {
@@ -376,6 +398,7 @@ public class DefaultAlbumLoader implements AlbumLoader {
                     mImageView.setImageDrawable(sErrorDrawable);
                 } else {
                     mImageView.setImageBitmap(mBitmap);
+                    if(callback!=null)callback.done(mBitmap.getHeight(),mBitmap.getWidth());
                 }
             }
         }
