@@ -58,15 +58,23 @@ public class ImageFragment extends Fragment {
                         ) {
                     images.add(new Image("file://" + albumFile.getPath()));
                 }
+                imageListAdapter.notifyDataSetChanged();
             }
         }, new ArrayList<AlbumFile>(), mSizeFilter, mMimeFilter, mDurationFilter, mFilterVisibility);
         scanTask.execute(new ArrayList<AlbumFile>());
     }
 
     private void initRecyclerView() {
-        StaggeredGridLayoutManager layoutManager = new StaggeredGridLayoutManager(2,
+        final StaggeredGridLayoutManager layoutManager = new StaggeredGridLayoutManager(2,
                 StaggeredGridLayoutManager.VERTICAL);
-        layoutManager.setGapStrategy(StaggeredGridLayoutManager.GAP_HANDLING_NONE);
+//        layoutManager.setGapStrategy(StaggeredGridLayoutManager.GAP_HANDLING_NONE);
+//        mRecyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
+//            @Override
+//            public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
+//                super.onScrollStateChanged(recyclerView, newState);
+//                layoutManager.invalidateSpanAssignments(); //防止第一行到顶部有空白区域
+//            }
+//        });
         mRecyclerView.setLayoutManager(layoutManager);
 
         imageListAdapter = new ImageListAdapter(getContext(), images);
