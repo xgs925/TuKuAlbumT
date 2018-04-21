@@ -74,6 +74,7 @@ public class ImageListAdapter extends RecyclerView.Adapter<ImageListAdapter.View
                         float r = (h * 1.0f) / w;
                         image.setRatio(r);
                         imageRMap.put(position, r);
+
                         RelativeLayout.LayoutParams rlp = (RelativeLayout.LayoutParams) viewHolder.imageView.getLayoutParams();
                         rlp.width=200;
                         rlp.height = (int) (rlp.width * r);
