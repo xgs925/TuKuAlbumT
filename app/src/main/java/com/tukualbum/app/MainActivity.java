@@ -12,18 +12,17 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AlertDialog;
-import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
 
+import com.tukualbum.app.common.BaseActivity;
 import com.tukualbum.tukualbum.R;
-import com.yanzhenjie.album.util.PermissionUtils;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends BaseActivity {
     private static final int PERMISSION_STORAGE_ALBUM = 1;
     private static final int PERMISSION_STORAGE_IMAGE = 2;
     private static final int PERMISSION_STORAGE_VIDEO = 3;
@@ -48,78 +47,78 @@ public class MainActivity extends AppCompatActivity {
         }
         mTabLayout.setupWithViewPager(mViewPager);//给TabLayout设置关联ViewPager，如果设置了ViewPager，那么ViewPagerAdapter中的getPageTitle()方法返回的就是Tab上的标题
 
-        requestPermission(PERMISSION_STORAGE_ALBUM);
+//        requestPermission(PERMISSION_STORAGE_ALBUM);
     }
 
-    /**
-     * Scan, but unknown permissions.
-     *
-     * @param requestCode request code.
-     */
-    private void requestPermission(int requestCode) {
-        if (Build.VERSION.SDK_INT >= 23) {
-            String[] permission = new String[]{
-                    Manifest.permission.READ_EXTERNAL_STORAGE,
-                    Manifest.permission.WRITE_EXTERNAL_STORAGE
-            };
-            String[] deniedPermissions = PermissionUtils.getDeniedPermissions(this, permission);
+//    /**
+//     * Scan, but unknown permissions.
+//     *
+//     * @param requestCode request code.
+//     */
+//    private void requestPermission(int requestCode) {
+//        if (Build.VERSION.SDK_INT >= 23) {
+//            String[] permission = new String[]{
+//                    Manifest.permission.READ_EXTERNAL_STORAGE,
+//                    Manifest.permission.WRITE_EXTERNAL_STORAGE
+//            };
+//            String[] deniedPermissions = PermissionUtils.getDeniedPermissions(this, permission);
+//
+//            if (deniedPermissions.length == 0) {
+//                dispatchGrantedPermission(requestCode);
+//            } else {
+//                ActivityCompat.requestPermissions(
+//                        this,
+//                        deniedPermissions,
+//                        requestCode);
+//            }
+//        } else {
+//            dispatchGrantedPermission(requestCode);
+//        }
+//    }
+//
+//    /**
+//     * Dispatch granted permission.
+//     */
+//    private void dispatchGrantedPermission(int requestCode) {
+//        switch (requestCode) {
+//            case PERMISSION_STORAGE_ALBUM:
+//            case PERMISSION_STORAGE_IMAGE:
+//            case PERMISSION_STORAGE_VIDEO: {
+//                mViewPager.setAdapter(mSectionsPagerAdapter);
+//                break;
+//            }
+//        }
+//    }
+//    @Override
+//    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+//        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+//        switch (requestCode) {
+//            case PERMISSION_STORAGE_ALBUM:
+//            case PERMISSION_STORAGE_IMAGE:
+//            case PERMISSION_STORAGE_VIDEO: {
+//                if (PermissionUtils.isGrantedResult(grantResults)) dispatchGrantedPermission(requestCode);
+//                else albumPermissionDenied();
+//                break;
+//            }
+//        }
+//    }
 
-            if (deniedPermissions.length == 0) {
-                dispatchGrantedPermission(requestCode);
-            } else {
-                ActivityCompat.requestPermissions(
-                        this,
-                        deniedPermissions,
-                        requestCode);
-            }
-        } else {
-            dispatchGrantedPermission(requestCode);
-        }
-    }
-
-    /**
-     * Dispatch granted permission.
-     */
-    private void dispatchGrantedPermission(int requestCode) {
-        switch (requestCode) {
-            case PERMISSION_STORAGE_ALBUM:
-            case PERMISSION_STORAGE_IMAGE:
-            case PERMISSION_STORAGE_VIDEO: {
-                mViewPager.setAdapter(mSectionsPagerAdapter);
-                break;
-            }
-        }
-    }
-    @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        switch (requestCode) {
-            case PERMISSION_STORAGE_ALBUM:
-            case PERMISSION_STORAGE_IMAGE:
-            case PERMISSION_STORAGE_VIDEO: {
-                if (PermissionUtils.isGrantedResult(grantResults)) dispatchGrantedPermission(requestCode);
-                else albumPermissionDenied();
-                break;
-            }
-        }
-    }
-
-    /**
-     * The permission for Album is denied.
-     */
-    private void albumPermissionDenied() {
-        new AlertDialog.Builder(this)
-                .setCancelable(false)
-                .setTitle(com.yanzhenjie.album.R.string.album_title_permission_failed)
-                .setMessage(com.yanzhenjie.album.R.string.album_permission_storage_failed_hint)
-                .setPositiveButton(com.yanzhenjie.album.R.string.album_dialog_sure, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        Toast.makeText(getApplicationContext(),"Permission Denied",Toast.LENGTH_SHORT).show();
-                    }
-                })
-                .show();
-    }
+//    /**
+//     * The permission for Album is denied.
+//     */
+//    private void albumPermissionDenied() {
+//        new AlertDialog.Builder(this)
+//                .setCancelable(false)
+//                .setTitle(com.yanzhenjie.album.R.string.album_title_permission_failed)
+//                .setMessage(com.yanzhenjie.album.R.string.album_permission_storage_failed_hint)
+//                .setPositiveButton(com.yanzhenjie.album.R.string.album_dialog_sure, new DialogInterface.OnClickListener() {
+//                    @Override
+//                    public void onClick(DialogInterface dialog, int which) {
+//                        Toast.makeText(getApplicationContext(),"Permission Denied",Toast.LENGTH_SHORT).show();
+//                    }
+//                })
+//                .show();
+//    }
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
